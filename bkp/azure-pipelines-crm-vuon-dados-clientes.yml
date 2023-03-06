@@ -1,0 +1,31 @@
+name: $(Rev:r)
+
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+    - dags/
+    #  - dags/crm_vuon_dados_clientes.py
+    exclude:
+      - azure-pipelines-crm-vuon-dados-clientes.yml
+      - azure-pipelines-deploy-crm-vuon-dados-clientes.yml
+
+stages:
+  - stage:
+    pool: AGP-Linux
+    jobs:
+      - job:
+        steps:
+        - checkout: self
+          clean: true
+          fetchDepth: 1
+          persistCredentials: true
+        #- publish: $(Pipeline.Workspace)/s/dags/crm_vuon_dados_clientes.py
+        - publish: $(Pipeline.Workspace)/s/
+          artifact: crm_vuon_dados_clientes
+        - script: |
+            git tag  $(Build.BuildNumber)
+            git push --tags
+          displayName: git tag
